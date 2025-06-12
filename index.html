@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>多言語例文クイズ</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+</head>
+<body>
+  <h1>多言語例文クイズ</h1>
+
+  <label for="grammarSelect">文法項目を選ぶ：</label>
+  <select id="grammarSelect"></select><br><br>
+
+  <label for="sourceLangSelect">出題言語を選ぶ：</label>
+  <select id="sourceLangSelect"></select>
+
+  <label for="targetLangSelect">解答言語を選ぶ：</label>
+  <select id="targetLangSelect"></select><br><br>
+
+  <button onclick="showQuestions()">問題を表示</button>
+  <button onclick="showAnswers()">解答を表示</button>
+
+  <div id="output"></div>
+
+  <script>
+    const exampleURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT0Iem_yxNPZtbeCjIal25VKCtGzcLprs_qSnf4peu5n0FPB0PBgBNyqCmwXekd9dvBtanJAI8Ihq4b/pub?gid=0&single=true&output=csv";
+
+    let exampleData = [];
+
+    Papa.parse(exampleURL, {
+      download: true,
+      header: false,
+      complete: function(results) {
+        exampleData = results.data.filter(row => row.length > 1);
+        populateGrammarOptions();
+        populateLanguageOptions();
+      }
+    });
+
+    function populateGrammarOptions() {
+      const grammarSet = new Set();
+      exampleData.slice(1).forEach(row => grammarSet.add(row[0]));
+      const grammarSelect = document.getElementById("grammarSelect");
+      grammarSet.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item;
+        option.textContent = item;
+        grammarSelect.appendChild(option);
+      });
+    }
+
+    function populateLanguageOptions() {
+      const headerRow = exampleData[0];
+      const sourceSelect = document.getElementById("sourceLangSelect");
+      const targetSelect = document.getElementById("targetLangSelect");
+      for (let i = 1; i < headerRow.length; i++) {
+        const option1 = document.createElement("option");
+        const option2 = document.createElement("option");
+        option1.value = option2.value = headerRow[i];
+        option1.textContent = option2.textContent = headerRow[i];
+        sourceSelect.appendChild(option1);
+        targetSelect.appendChild(option2);
+      }
+    }
+
+    function showQuestions() {
+      const grammar = document.getElementById("grammarSelect").value;
+      const lang = document.getElementById("sourceLangSelect").value;
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = "";
+
+      const header = exampleData[0];
+      const langIndex = header.indexOf(lang);
+      const questions = exampleData.slice(1).filter(row => row[0] === grammar);
+
+      questions.forEach((row, idx) => {
+        const question = document.createElement("div");
+        question.innerHTML = `(${idx + 1}) ${row[langIndex]}`;
+        outputDiv.appendChild(question);
+      });
+    }
+
+    function showAnswers() {
+      const grammar = document.getElementById("grammarSelect").value;
+      const lang1 = document.getElementById("sourceLangSelect").value;
+      const lang2 = document.getElementById("targetLangSelect").value;
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = "";
+
+      const header = exampleData[0];
+      const idx1 = header.indexOf(lang1);
+      const idx2 = header.indexOf(lang2);
+      const questions = exampleData.slice(1).filter(row => row[0] === grammar);
+
+      questions.forEach((row, idx) => {
+        const q = document.createElement("div");
+        q.innerHTML = `(${idx + 1}) ${row[idx1]} / ${row[idx2]}`;
+        outputDiv.appendChild(q);
+
+        const fileNum = ("00" + (idx + 1)).slice(-3);
+        const code1 = getLangCode(lang1);
+        const code2 = getLangCode(lang2);
+
+        const a1 = document.createElement("div");
+        const a2 = document.createElement("div");
+        a1.innerHTML = `<audio controls src="audio/${grammar}_${code1}_${fileNum}.mp3"></audio>`;
+        a2.innerHTML = `<audio controls src="audio/${grammar}_${code2}_${fileNum}.mp3"></audio>`;
+        outputDiv.appendChild(a1);
+        outputDiv.appendChild(a2);
+      });
+    }
+
+    function getLangCode(label) {
+      const map = {
+        "English": "en",
+        "日本語": "ja",
+        "Tiếng Việt": "vi",
+        "汉语": "zh",
+        "Bahasa Indonesia": "id",
+        "ภาษาไทย": "th",
+        "မြန်မာစာ": "my",
+        "韓国語": "ko",
+        "اردو": "ur",
+        "廣東話": "yue",
+        "हिन्दी": "hi",
+        "Le français": "fr",
+        "Português": "pt"
+      };
+      return map[label] || label;
+    }
+  </script>
+</body>
+</html>
