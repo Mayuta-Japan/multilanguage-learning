@@ -29,7 +29,7 @@
   <div id="output"></div>
 
   <script>
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0Iem_yxNPZtbeCjIal25VKCtGzcLprs_qSnf4peu5n0FPB0PBgBNyqCmwXekd9dvBtanJAI8Ihq4b/pub?gid=0&single=true&output=csv'; // ← CSVの公開リンクに差し替えてください
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0Iem_yxNPZtbeCjIal25VKCtGzcLprs_qSnf4peu5n0FPB0PBgBNyqCmwXekd9dvBtanJAI8Ihq4b/pub?gid=0&single=true&output=csv';
 
     let data = [];
     let headers = [];
@@ -38,7 +38,7 @@
       const res = await fetch(sheetUrl);
       const text = await res.text();
       const rows = text.trim().split('\n').map(row => row.split(','));
-      headers = rows[0].slice(1);
+      headers = rows[0].slice(2); // C列以降を言語名として取得
       data = rows.slice(1);
 
       const grammarSet = [...new Set(data.map(row => row[0]))];
@@ -66,7 +66,7 @@
       const qLang = document.getElementById('questionLang').value;
       const output = document.getElementById('output');
       output.innerHTML = '';
-      const qIndex = headers.indexOf(qLang) + 1;
+      const qIndex = headers.indexOf(qLang) + 2; // C列以降なので+2
       const filtered = data.filter(row => row[0] === grammar);
       filtered.forEach((row, i) => {
         const div = document.createElement('div');
@@ -81,23 +81,18 @@
       const qLang = document.getElementById('questionLang').value;
       const aLang = document.getElementById('answerLang').value;
       const output = document.getElementById('output');
-      const qIndex = headers.indexOf(qLang) + 1;
-      const aIndex = headers.indexOf(aLang) + 1;
+      const qIndex = headers.indexOf(qLang) + 2;
+      const aIndex = headers.indexOf(aLang) + 2;
       const filtered = data.filter(row => row[0] === grammar);
 
       Array.from(output.children).forEach((block, i) => {
-        const qText = filtered[i][qIndex];
         const aText = filtered[i][aIndex];
-
-        const qLangCode = qLang === '漢語' ? 'zh' : qLang === 'Tiếng Việt' ? 'vi' : convertLang(qLang);
-        const aLangCode = aLang === '漢語' ? 'zh' : aLang === 'Tiếng Việt' ? 'vi' : convertLang(aLang);
-
+        const qLangCode = convertLang(qLang);
+        const aLangCode = convertLang(aLang);
         const grammarNum = grammar.split('_')[0];
         const numStr = String(i + 1).padStart(3, '0');
-
-        const qAudio = `<strong>${qLang}</strong>: <audio controls src="audio/${grammarNum}_${qLangCode}_${numStr}.mp3"></audio>`;
-        const aAudio = `<strong>${aLang}</strong>: <audio controls src="audio/${grammarNum}_${aLangCode}_${numStr}.mp3"></audio>`;
-
+        const qAudio = `<audio controls src="audio/${grammarNum}_${qLangCode}_${numStr}.mp3"></audio>`;
+        const aAudio = `<audio controls src="audio/${grammarNum}_${aLangCode}_${numStr}.mp3"></audio>`;
         block.innerHTML += `<br>${aText}<br>${qAudio}<br>${aAudio}`;
       });
     }
