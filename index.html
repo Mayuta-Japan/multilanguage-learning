@@ -2,19 +2,19 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>多言語例文クイズ / Multi-Language-Sentence Quiz</title>
+  <title>多言語学習ライブラリー / Multi-Language-Learning Library</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 </head>
 <body>
-  <h1>多言語例文クイズ / Multi-Language-Sentence Quiz</h1>
+  <h1>多言語学習ライブラリー / Multi-Language-Learning Library</h1>
 
-  <label for="grammarSelect">文法項目を選ぶ / Choose a section: </label>
+  <label for="grammarSelect">セクションを選ぶ / Choose a section:</label>
   <select id="grammarSelect"></select><br><br>
 
-  <label for="sourceLangSelect">出題言語を選ぶ / Choose a language for question: </label>
+  <label for="sourceLangSelect">出題言語を選ぶ / Choose a language for question:</label>
   <select id="sourceLangSelect"></select>
 
-  <label for="targetLangSelect">解答言語を選ぶ / Choose a language for answer: </label>
+  <label for="targetLangSelect">解答言語を選ぶ / Choose a language for answer:</label>
   <select id="targetLangSelect"></select><br><br>
 
   <button onclick="showQuestions()">問題を表示 / Generate questions</button>
@@ -53,7 +53,7 @@
       const headerRow = exampleData[0];
       const sourceSelect = document.getElementById("sourceLangSelect");
       const targetSelect = document.getElementById("targetLangSelect");
-      for (let i = 1; i < headerRow.length; i++) {
+      for (let i = 2; i < headerRow.length; i++) {
         const option1 = document.createElement("option");
         const option2 = document.createElement("option");
         option1.value = option2.value = headerRow[i];
